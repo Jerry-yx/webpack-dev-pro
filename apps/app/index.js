@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Hello from './hello.js';
-import styles from './style/index.less'
+import Hello from '../hello.js';
+import styles from '../style/index.less'
 //Index app
 class Index extends	React.Component {
 	render(){

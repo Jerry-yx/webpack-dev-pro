@@ -4,9 +4,9 @@
   "description": "webpack test one",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dll": "webpack --config webpack.dll.config.js --progress --color --reason",
-    "dev": "webpack --config weback.dev.config.js --progress --color --reason",
-    "server": "webpack-dev-server --open --port 8088"
+    "dll": "webpack --config webpack.dll.config.js --progress --color ",
+    "dev": "webpack --config webpack.base.config.js --progress --color ",
+    "start": "webpack-dev-server --config webpack.base.config.js --open --port 8028"
   },
   "main": "index.js",
   "dependencies": {

@@ -4,14 +4,17 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const path = require('path');
 
 module.exports ={
-	entry: __dirname +'/app/index.js',//path.resolve是nodeJs里面方法，可以连接两个相对路径并生成绝对路径；__dirname node.js全局变量  __dirname 表示当前文件所在的目录的绝对路径 __filename 表示当前文件的绝对路径
+	entry: {
+		app1:__dirname +'/apps/app/index.js',
+		app2:__dirname+'/apps/appTwo/index.js'
+	},//path.resolve是nodeJs里面方法，可以连接两个相对路径并生成绝对路径；__dirname node.js全局变量  __dirname 表示当前文件所在的目录的绝对路径 __filename 表示当前文件的绝对路径
 	output: { 
-		filename: 'js/bundle.js',
+		filename: '[name]/js/bundle.js',
 		path: __dirname + "/public"
 	},
 	devtool: 'eval-source-map',//方便调试 cheap-module-eval-source-map大型项目中打包速度快不方便调试
 	devServer: {//安装npm install -g webpack-dev-server 搭建本地服务器
-		contentBase: './public',//服务器加载页面得目录
+		contentBase: './public/app1/',//服务器加载页面得目录
 		historyApiFallback: true,//不跳转
 		hot:true,
 		inline: true//实时刷新
@@ -23,7 +26,7 @@ module.exports ={
 				use:{
 					loader:'babel-loader',//loader
 				},
-				exclude: /node_modules/ //排除不需要处理文件
+				exclude: path.resolve(__dirname,'/node_modules/') //排除不需要处理文件
 			},{
 				test:/\.css$/,
 				use: [{
@@ -34,7 +37,7 @@ module.exports ={
 							modules: true,
 							localIdentName: '[name]_[local]--[hash:base64:5]'//制定css类名格式 可防止局部css污染全局样式
 						}
-					}
+					}    
 				]
 
 			},{
@@ -57,11 +60,11 @@ module.exports ={
 				test: /\.[png|jpg|svg|gif]$/,
 				use: [{
 					loader: "file-loader",
-					options{
-						name:[name]-[hash:base64:5].[ext]
+					options:{
+						name:"[name]-[hash:base64:5].[ext]"
 					}
 				},{
-					loder: "url-loader",
+					loader: "url-loader",
 					options:{
 						limit:2000
 					}
@@ -101,13 +104,33 @@ module.exports ={
 	},
 	plugins: [
 		new webpack.HotModuleReplacementPlugin(),
-		new HtmlWebpackPlugin({
-			template:__dirname + "/app/index.html",
-			title:"my html",
-			inject:'false',
-			date: new Date()
+		new webpack.optimize.CommonsChunkPlugin({//打包公共代码
+			name:'commons',//命名公共代码的chunk
+			filename:'[name].bundle.js',
+			minChunks:2,//最少引用次数
+			//chunks默认为所有chunk
 		}),
-		new CleanWebpackPlugin(path.resolve('./public'),{
+		new webpack.DllReferencePlugin({
+			manifest: require('./public/vendor/manifest.json'),//指定manifeat.json
+			name: 'vendor'
+		}),
+		new HtmlWebpackPlugin({
+			template:__dirname + "/apps/index.html",
+			filename:__dirname + "/public/app1/index.html",
+			title:"my html1",
+			inject:'false',
+			date: new Date(),
+			chunks:['app1','vendor']
+		}),
+		new HtmlWebpackPlugin({
+			template:__dirname + "/apps/index.html",
+			filename:__dirname + "/public/app2/index.html",
+			title:"my html2",
+			inject:'false',
+			date: new Date(),
+			chunks:['app2','vendor']
+		}),
+		new CleanWebpackPlugin(path.resolve('./public/app'),{
 			verbose:false
 		})
 	]
