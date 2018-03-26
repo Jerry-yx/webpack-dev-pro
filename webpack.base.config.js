@@ -1,6 +1,8 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
+/*const CleanWebpackPlugin = require('clean-webpack-plugin')*/
+const bundleConfig = require("/bundle-config.json");
 const path = require('path');
 
 module.exports ={
@@ -26,7 +28,7 @@ module.exports ={
 				use:{
 					loader:'babel-loader',//loader
 				},
-				exclude: path.resolve(__dirname,'/node_modules/') //排除不需要处理文件
+				exclude: path.resolve(__dirname,'./node_modules/') //排除不需要处理文件
 			},{
 				test:/\.css$/,
 				use: [{
@@ -104,34 +106,37 @@ module.exports ={
 	},
 	plugins: [
 		new webpack.HotModuleReplacementPlugin(),
-		new webpack.optimize.CommonsChunkPlugin({//打包公共代码
+		/*new webpack.optimize.CommonsChunkPlugin({//打包公共代码
 			name:'commons',//命名公共代码的chunk
 			filename:'[name].bundle.js',
 			minChunks:2,//最少引用次数
 			//chunks默认为所有chunk
-		}),
+		}),*/
 		new webpack.DllReferencePlugin({
-			manifest: require('./public/vendor/manifest.json'),//指定manifeat.json
-			name: 'vendor'
+			//manifest: require('./public/vendor/manifest.json'),//指定manifeat.json
+			manifest: require('./public/vendor/bundle-manifest.json'),
+			context: __dirname,
 		}),
 		new HtmlWebpackPlugin({
 			template:__dirname + "/apps/index.html",
 			filename:__dirname + "/public/app1/index.html",
 			title:"my html1",
 			inject:'false',
-			date: new Date(),
-			chunks:['app1','vendor']
+			bundleName:bundleConfig.bundle.js,
+			chunks:['app1','commons'],//添加公共的模块到html。CommonsChunkPlugin的name.
 		}),
 		new HtmlWebpackPlugin({
 			template:__dirname + "/apps/index.html",
 			filename:__dirname + "/public/app2/index.html",
 			title:"my html2",
 			inject:'false',
-			date: new Date(),
-			chunks:['app2','vendor']
+			chunks:['app2','commons'],
 		}),
-		new CleanWebpackPlugin(path.resolve('./public/app'),{
+		new AddAssetHtmlPlugin({//与html-webpacl-plugin配合添加dll到html里面
+			filepath: path.resolve(__dirname, './public/vendor/*.dll.js'),
+		}),
+		/*new CleanWebpackPlugin(path.resolve('./public/app'),{
 			verbose:false
-		})
+		})*/
 	]
 };

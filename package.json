@@ -4,8 +4,8 @@
   "description": "webpack test one",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dll": "webpack --config webpack.dll.config.js --progress --color ",
-    "dev": "webpack --config webpack.base.config.js --progress --color ",
+    "dll": "webpack --config webpack.dll.config.js --color ",
+    "dev": "webpack --config webpack.base.config.js --color ",
     "start": "webpack-dev-server --config webpack.base.config.js --open --port 8028"
   },
   "main": "index.js",
@@ -13,6 +13,8 @@
     "react-dom": "^16.2.0"
   },
   "devDependencies": {
+    "add-asset-html-webpack-plugin": "^2.1.3",
+    "assets-webpack-plugin": "^3.5.1",
     "autoprefixer": "^8.1.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.4",
