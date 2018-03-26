@@ -13,13 +13,15 @@ module.exports={
 	},
 	plugins:[
 		new webpack.DllPlugin({
-			//用了assets-webpack-plugin   path: path.resolve(__dirname,'./public/vendor/manifest.json'),//Dll文件中各模块的索引，供DllReferencePlugin读取
-			name:'[name]_[hash]',
+			/*用了assets-webpack-plugin   
+			path: path.resolve(__dirname,'./public/vendor/manifest.json'),//Dll文件中各模块的索引，供DllReferencePlugin读取
+			name:'[name]_[hash]',*/
+			path: path.resolve(__dirname,'./public/vendor/manifest.json'),
 			context: __dirname,
 		}),
 		new AssetsPlugin({
+			path: path.resolve(__dirname , "./public/vendor"),
             filename: 'bundle-config.json',
-            path: __dirname + "/public/vendor"
         }),
 		new CleanWebpackPlugin(path.resolve('./public'),{
 			verbose:false

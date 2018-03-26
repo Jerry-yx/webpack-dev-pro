@@ -2,7 +2,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 /*const CleanWebpackPlugin = require('clean-webpack-plugin')*/
-const bundleConfig = require("/bundle-config.json");
+const bundleConfig = require("./public/vendor/bundle-config.json");
 const path = require('path');
 
 module.exports ={
@@ -113,8 +113,7 @@ module.exports ={
 			//chunks默认为所有chunk
 		}),*/
 		new webpack.DllReferencePlugin({
-			//manifest: require('./public/vendor/manifest.json'),//指定manifeat.json
-			manifest: require('./public/vendor/bundle-manifest.json'),
+			manifest: require('./public/vendor/manifest.json'),//指定manifeat.json
 			context: __dirname,
 		}),
 		new HtmlWebpackPlugin({
@@ -122,8 +121,8 @@ module.exports ={
 			filename:__dirname + "/public/app1/index.html",
 			title:"my html1",
 			inject:'false',
-			bundleName:bundleConfig.bundle.js,
-			chunks:['app1','commons'],//添加公共的模块到html。CommonsChunkPlugin的name.
+			bundleName:"bundleConfig.vendor.js",
+			chunks:['app1','commons']//添加公共的模块到html。CommonsChunkPlugin的name.
 		}),
 		new HtmlWebpackPlugin({
 			template:__dirname + "/apps/index.html",
@@ -131,10 +130,12 @@ module.exports ={
 			title:"my html2",
 			inject:'false',
 			chunks:['app2','commons'],
+			bundleName:"bundleConfig.vendor.js",
 		}),
+		/*利用bundleName添加进去
 		new AddAssetHtmlPlugin({//与html-webpacl-plugin配合添加dll到html里面
 			filepath: path.resolve(__dirname, './public/vendor/*.dll.js'),
-		}),
+		}),*/
 		/*new CleanWebpackPlugin(path.resolve('./public/app'),{
 			verbose:false
 		})*/
