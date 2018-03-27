@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Hello from '../hello.js';
-import styles from '../style/index.less'
+import styles from '../style/index.less';
 //Index app
 class Index extends	React.Component {
 	render(){
@@ -11,5 +11,4 @@ class Index extends	React.Component {
 ReactDOM.render(<Index/>,document.getElementById('root'));
 export default Index;
 
-//render main component
 
