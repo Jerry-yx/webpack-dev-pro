@@ -3,6 +3,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 /*const CleanWebpackPlugin = require('clean-webpack-plugin')*/
 const bundleConfig = require("./public/vendor/bundle-config.json");
+const ExtractCss = require("extract-text-webpack-plugin");
+const ExtractLess = require("extract-text-webpack-plugin");
 const path = require('path');
 
 module.exports ={
@@ -14,41 +16,37 @@ module.exports ={
 		filename: '[name]/js/bundle.js',
 		path: __dirname + "/public"
 	},
-	devtool: 'eval-source-map',//方便调试 cheap-module-eval-source-map大型项目中打包速度快不方便调试
-	devServer: {//安装npm install -g webpack-dev-server 搭建本地服务器
-		contentBase: './public/app1/',//服务器加载页面得目录
-		historyApiFallback: true,//不跳转
-		hot:true,
-		inline: true//实时刷新
-	},
 	module: {
-		rules: [
-			{
-				test:/(\.jsx|\.js)$/,//正则表达式筛选文件
-				use:{
-					loader:'babel-loader',//loader
-				},
-				exclude: path.resolve(__dirname,'./node_modules/') //排除不需要处理文件
-			},{
+		rules: [{
 				test:/\.css$/,
-				use: [{
+				use: ExtractCss.extract({
+					fallback:[{
 						loader: "style-loader"//将所有的计算后的样式加入页面中
-					},{
+					}],
+					use: [{
 						loader: 'css-loader',//能够使用类似@import 和 url(...)的方法
 						options: {
+					        minimize: true,
+					        '-autoprefixer': true,
 							modules: true,
 							localIdentName: '[name]_[local]--[hash:base64:5]'//制定css类名格式 可防止局部css污染全局样式
 						}
-					}    
-				]
+					},{
+						loader:'postcss-loader'//import得css也要用postcss-loader处理？？？
+					}]  
+				})
 
 			},{
 				test: /\.less$/,
-				use:[{
+				use:ExtractLess.extract({
+					fallback:[{
 						loader: "style-loader"//将所有的计算后的样式加入页面中
-					},{
+					}],
+					use: [{
 						loader: 'css-loader',//能够使用类似@import 和 url(...)的方法
 						options: {
+							minimize: true,
+					        '-autoprefixer': true,
 							modules: true,
 							localIdentName: '[name]_[local]--[hash:base64:5]'//制定css类名格式 可防止局部css污染全局样式
 						}
@@ -56,13 +54,20 @@ module.exports ={
 						loader:'less-loader'
 					},{
 						loader:'postcss-loader'//import得css也要用postcss-loader处理？？？
-					}
-				]
+					}]
+				})
+			},{
+				test:/(\.jsx|\.js)$/,//正则表达式筛选文件
+				use:{
+					loader:'babel-loader',//loader
+				},
+				exclude: path.resolve(__dirname,'./node_modules/') //排除不需要处理文件
 			},{
 				test: /\.[png|jpg|svg|gif]$/,
 				use: [{
 					loader: "file-loader",
 					options:{
+						outputPath: "images/",
 						name:"[name]-[hash:base64:5].[ext]"
 					}
 				},{
@@ -105,6 +110,8 @@ module.exports ={
 		]
 	},
 	plugins: [
+		// webpack 内置的 banner-plugin
+	    new webpack.BannerPlugin("Copyright by https://github.com/yuanxuyan."),
 		new webpack.HotModuleReplacementPlugin(),
 		/*new webpack.optimize.CommonsChunkPlugin({//打包公共代码
 			name:'commons',//命名公共代码的chunk
@@ -114,7 +121,6 @@ module.exports ={
 		}),*/
 		new webpack.DllReferencePlugin({
 			manifest: require('./public/vendor/manifest.json'),//指定manifest.json
-			//manifest: bundleConfig,//使用assets-webpack-plugin 
 			context: __dirname,
 		}),
 		new HtmlWebpackPlugin({
@@ -140,5 +146,8 @@ module.exports ={
 		/*new CleanWebpackPlugin(path.resolve('./public/app'),{
 			verbose:false
 		})*/
+		new ExtractCss({filename:"css/styles-[hash].css"}),//将inline css提取到单独的css文件。
+		new ExtractLess({filename:"css/styles-[hash].css"}),//将inline css提取到单独的css文件。
+		//// 现在是默认启用,不再需要手动启动 new webpack.optimize.OccurenceOrderPlugin();//将用的最多的模块ID弄成最小的。通过分析ID，可以建议降低总文件的大小
 	]
 };

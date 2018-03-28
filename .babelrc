@@ -6,7 +6,7 @@
 			"react-transform",
 			{
 			"transforms":[{
-				"transform":"react-transform-hmr",
+				"transform":"react-transform-hmr", //避免重复引入
 	  			"imports":["react"],
 	  			"locals": ["module"]
 	  		}]
